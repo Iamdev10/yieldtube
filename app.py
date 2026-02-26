@@ -3,7 +3,7 @@ import re
 import json
 import subprocess
 import tempfile
-from flask import Flask, request, jsonify, send_file, send_from_directory
+from flask import Flask, request, jsonify, Response
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -13,9 +13,6 @@ try:
     subprocess.run(['pip', 'install', '--upgrade', 'yt-dlp'], capture_output=True, timeout=60)
 except Exception:
     pass
-
-def is_valid_youtube_url(url):
-    return bool(re.search(r'(?:youtube\.com/watch|youtu\.be/|youtube\.com/shorts/|youtube\.com/embed/)', url))
 
 HTML = """<!DOCTYPE html>
 <html lang="en">
@@ -739,7 +736,7 @@ HTML = """<!DOCTYPE html>
   }
 
   function isValidYouTubeUrl(url) {
-    return /(?:youtube\\.com\\/watch|youtu\\.be\\/|youtube\\.com\\/shorts\\/|youtube\\.com\\/embed\\/)/.test(url);
+    return /(?:youtube\\\\.com\\\\/watch|youtu\\\\.be\\\\/|youtube\\\\.com\\\\/shorts\\\\/|youtube\\\\.com\\\\/embed\\\\/)/.test(url);
   }
 
   function showError(msg) {
@@ -779,8 +776,8 @@ HTML = """<!DOCTYPE html>
       if (!res.ok) throw new Error(data.error || 'Failed to fetch video info');
 
       document.getElementById('videoTitle').textContent = data.title;
-      document.getElementById('videoChannel').textContent = '\\uD83D\\uDCFA ' + data.channel;
-      document.getElementById('videoDuration').textContent = '\\u23F1 ' + data.duration;
+      document.getElementById('videoChannel').textContent = '\\\\uD83D\\\\uDCFA ' + data.channel;
+      document.getElementById('videoDuration').textContent = '\\\\u23F1 ' + data.duration;
 
       const thumbContainer = document.getElementById('thumbContainer');
       thumbContainer.innerHTML = `<img class="video-thumb" src="${data.thumbnail}" alt="thumbnail" onerror="this.src='https://img.youtube.com/vi/${data.video_id}/mqdefault.jpg'">`;
@@ -813,7 +810,7 @@ HTML = """<!DOCTYPE html>
     if (!currentVideoUrl) return;
 
     btn.disabled = true;
-    btn.innerHTML = `\\u23F3 Preparing download...`;
+    btn.innerHTML = `\\\\u23F3 Preparing download...`;
 
     try {
       const res = await fetch(`${API_BASE}/api/download`, {
@@ -838,7 +835,7 @@ HTML = """<!DOCTYPE html>
         a.click();
         document.body.removeChild(a);
 
-        btn.innerHTML = `\\u2705 Download Started!`;
+        btn.innerHTML = `\\\\u2705 Download Started!`;
         btn.style.background = 'rgba(100,200,100,0.15)';
         btn.style.color = '#90ee90';
         setTimeout(resetBtn, 3000);
@@ -847,7 +844,7 @@ HTML = """<!DOCTYPE html>
       }
 
     } catch (err) {
-      btn.innerHTML = `\\u274C ${err.message}`;
+      btn.innerHTML = `\\\\u274C ${err.message}`;
       btn.style.background = 'rgba(220,50,50,0.15)';
       btn.style.color = '#f88';
       setTimeout(resetBtn, 4000);
@@ -896,9 +893,12 @@ HTML = """<!DOCTYPE html>
 </html>
 """
 
+def is_valid_youtube_url(url):
+    return bool(re.search(r'(?:youtube\\.com/watch|youtu\\.be/|youtube\\.com/shorts/|youtube\\.com/embed/)', url))
+
 @app.route('/')
 def index():
-    return HTML, 200, {"Content-Type": "text/html"}
+    return Response(HTML, mimetype='text/html')
 
 @app.route('/api/info', methods=['POST'])
 def get_info():
