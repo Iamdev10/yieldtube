@@ -11,6 +11,12 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 app = Flask(__name__, static_folder=os.path.join(BASE_DIR, 'static'), static_url_path='')
 CORS(app)
 
+# Auto-update yt-dlp on startup to stay current with YouTube changes
+try:
+    subprocess.run(['pip', 'install', '--upgrade', 'yt-dlp'], capture_output=True, timeout=60)
+except Exception:
+    pass
+
 DOWNLOAD_DIR = tempfile.mkdtemp()
 
 def extract_video_id(url):

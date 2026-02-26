@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
-# Install ffmpeg (needed by yt-dlp for merging video+audio)
+# Install ffmpeg
 apt-get update && apt-get install -y ffmpeg
+
+# Install Python dependencies
 pip install -r requirements.txt
+
+# Force upgrade yt-dlp to latest version
+pip install --upgrade yt-dlp
